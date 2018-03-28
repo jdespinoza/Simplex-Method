@@ -48,6 +48,7 @@ def file_to_matrix(line, type):
 	l = 0
 	k = 1
 	flag = -1
+	sign = []
 	for i in range(restrictions+1):
 		flag += 1
 		k = 1
@@ -59,13 +60,15 @@ def file_to_matrix(line, type):
 				matrix[i][j] = 0
 			elif j == restrictions+decision:
 				matrix[i][j] = line_aux[l]
-				l += 2
+				l += 1
+				sign.append(line_aux[l])
+				l += 1
 			else:
 				if k == flag:
 					matrix[i][j] = 1
 				k += 1
 				
-	return SimplexMethod(matrix, restrictions+1, restrictions+decision+1, decision, restrictions)
+	return SimplexMethod(matrix, restrictions+1, restrictions+decision+1, decision, restrictions, sign)
 
 if __name__ == '__main__':
 	
@@ -82,6 +85,7 @@ if __name__ == '__main__':
 		else:
 			simplex.build_matrix()
 			simplex.print_matrix()
+			simplex.simplex()
 	 
 	if args.output:
 		print("Salida:", args.output)
