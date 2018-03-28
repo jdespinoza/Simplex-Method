@@ -11,11 +11,9 @@ def open_file(file_name):
 		file = open(file_name, "r")
 		line = file.read()
 		if line.find('min') != -1:
-			print("es min")
 			type = 1
 		elif line.find('max') != -1:
 			type = 2
-			print("es max")
 		else:
 			type = 0
 			print("Error: Invalid problem")
@@ -78,14 +76,15 @@ if __name__ == '__main__':
 	args = parser.parse_args()
 	 
 	if args.input:
-		print("Entrada:", args.input)
+		print("Input FIle:", args.input)
 		simplex = open_file(args.input)
 		if simplex is None:
-			print("es nulo")
+			print("Error: Simplex is None")
 		else:
 			simplex.build_matrix()
-			simplex.print_matrix()
 			simplex.simplex()
+			simplex.print_matrix()
+			simplex.print_result()
 	 
 	if args.output:
-		print("Salida:", args.output)
+		print("Output File:", args.output)
