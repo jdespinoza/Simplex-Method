@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
- 
+
 import argparse
 import numpy as np
 
@@ -38,11 +38,11 @@ def file_to_matrix(line, type):
 			line_aux.append(array[1])
 		else:
 			line_aux.append(i)
-		
+
 	for i in range(decision):
 		line_aux[i] = int(line_aux[i]) * -1
-		
-		
+
+
 	l = 0
 	k = 1
 	flag = -1
@@ -65,16 +65,16 @@ def file_to_matrix(line, type):
 				if k == flag:
 					matrix[i][j] = 1
 				k += 1
-				
+
 	return SimplexMethod(matrix, restrictions+1, restrictions+decision+1, decision, restrictions, sign)
 
 if __name__ == '__main__':
-	
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-i", "--input", help= "Input file name")
 	parser.add_argument("-o", "--output", help="Output file name")
 	args = parser.parse_args()
-	 
+
 	if args.input:
 		print("Input FIle:", args.input)
 		simplex = open_file(args.input)
@@ -82,9 +82,9 @@ if __name__ == '__main__':
 			print("Error: Simplex is None")
 		else:
 			simplex.build_matrix()
-			simplex.simplex()
+			simplex.simplex(args.output)
 			simplex.print_matrix()
 			simplex.print_result()
-	 
+
 	if args.output:
 		print("Output File:", args.output)
