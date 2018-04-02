@@ -61,7 +61,7 @@ def file_to_matrix(line, type):
 		largo = restrictions+decision+((cantidad)*2)
 	else:
 		largo = restrictions+decision+1
-	print(largo)
+	# print(largo)
 	matrix = np.zeros((restrictions+1, largo))
 	
 	# for p in range(largo):
@@ -76,9 +76,7 @@ def file_to_matrix(line, type):
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
-		print("algo2")
-		for j in range(largo):
-			print("algo")			
+		for j in range(largo):		
 			if j < decision:
 				matrix[i][j] = line_aux[l]
 				l += 1
@@ -98,12 +96,12 @@ def file_to_matrix(line, type):
 						matrix[i][j] = 1
 				k += 1
 				
-	print(sign)
+	# print(sign)
 	M = 2		
 	for i in range(len(sign)):
 		# print(i)
 		j = (i+decision)
-		print(j)
+		# print(j)
 		if sign[i] == '=' or sign[i] == '>=':
 			if type ==2:
 				matrix[0][j] = 1*M
@@ -115,9 +113,9 @@ def file_to_matrix(line, type):
 				if type ==2:
 					matrix[0][j] -= matrix[i+1][j]*M
 	# print(sign)
-	print(matrix)
+	# print(matrix)
 
-	# return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
 
 if __name__ == '__main__':
 
