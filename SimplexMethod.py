@@ -77,7 +77,7 @@ class SimplexMethod(object):
 	def choose_column(self):
 		bit = self.matrix[0][0]
 		j = 0
-		for i in range(1, self.column_size):
+		for i in range(1, self.column_size-1):
 			if self.matrix[0][i] < bit:
 				bit = self.matrix[0][i]
 				j = i
