@@ -17,6 +17,7 @@ def open_file(file_name):
 		else:
 			type = 0
 			print("Error: Invalid problem")
+		checker = check(line) 
 		aux = file_to_matrix(line, type)
 		file.close()
 	except:
@@ -24,27 +25,54 @@ def open_file(file_name):
 		print("No such file or directory: ", file_name)
 	return aux
 
+def check(line):
+	line2 = line.split(',')
+	aux = []
+	for i in line2:
+		if i.find('\n') != -1:
+			array = i.split('\n')
+			aux.append(array[0])
+			aux.append(array[1])
+			
+		else:
+			aux.append(i)
+	print(aux)
+	
+	return 0
+	
 def file_to_matrix(line, type):
 	flag_igual = 0
 	largo = 0
-	decision = int(line[4])
-	restrictions = int(line[6])
-	# matrix = np.zeros((restrictions+1, restrictions+decision+1))
-	line = line[8:]
-	line = line.split(',')
-	line_aux = []
-	for i in line:
+	line2 = line.split(',')
+	element0 = line2[0].split('\n')
+	element1= line2[1].split('\n')
+	decision = int(element0[1])
+	restrictions = int(element1[0])
+	aux = []
+	for i in line2:
 		if i.find('\n') != -1:
 			array = i.split('\n')
-			line_aux.append(array[0])
-			line_aux.append(array[1])
+			aux.append(array[0])
+			aux.append(array[1])
+			
 		else:
-			line_aux.append(i)
-
+			aux.append(i)
+	# matrix = np.zeros((restrictions+1, restrictions+decision+1))
+	# line = line[8:]
+	# line = line.split(',')
+	line_aux = []
+	# for i in line:
+	# if i.find('\n') != -1:
+	# array = i.split('\n')
+	# line_aux.append(array[0])
+	# line_aux.append(array[1])	
+	# else:
+	# line_aux.append(i)
+	line_aux = aux[3:]
 	for i in range(decision):
-		line_aux[i] = int(line_aux[i]) * -1
-
-
+		if type == 2:
+			line_aux[i] = int(line_aux[i]) * -1
+	# print(line_aux)
 	l = 0
 	k = 1
 	flag = -1
@@ -61,18 +89,11 @@ def file_to_matrix(line, type):
 		largo = restrictions+decision+cantidad
 	else:
 		largo = restrictions+decision+cantidad
-	print(restrictions)
-	print(decision)
+	# print(cantidad)
+	# print(restrictions)
+	# print(decision)
+	# print(largo)
 	matrix = np.zeros((restrictions+1, largo))
-	# for p in range(largo):
-	# if p < decision:
-	# matrix[0][p] = line_aux[l]
-	# print(matrix[0][p])
-	# l += 1
-	# else:
-	# matrix[0][p] = 0
-	# print(matrix[0][p])
-
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
@@ -105,28 +126,29 @@ def file_to_matrix(line, type):
 				
 	# print(sign)
 	M = 1	
-	for i in range(len(sign)):
-		# print(i)
-		j = (i+decision)
-		# print(j)
+	i = 0
+	j= 0 + decision
+	while(i<len(sign)):
 		if sign[i] == '=':
-			if type ==2:
-				matrix[0][j] = 1*M
-		if sign[i] == '>=':
-			if type ==2:
-				matrix[0][j+1]=1*M
-			
+			matrix[0][j] = 1*M
+			j+=1
+		elif sign[i] == '>=':
+			matrix[0][j+1] = 1*M
+			j+=2
+		else:
+			j+=1
+		i+=1
+				
 	# print(matrix)
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
 			for j in range(largo):
-				if type ==2:
 					matrix[0][j] -= matrix[i+1][j]*M
 	# print(sign)
-	print(matrix)
+	# print(matrix)
 
-	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
+	# return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
 
 if __name__ == '__main__':
 
@@ -148,6 +170,6 @@ if __name__ == '__main__':
 				simplex.print_result()
 			else:
 				simplex.build_matrix()
-				simplex.simplex("salida.txt")
+				simplex.simplex("out_"+args.input)
 				simplex.print_matrix()
 				simplex.print_result()
