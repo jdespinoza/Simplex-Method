@@ -49,7 +49,7 @@ def file_to_matrix(line, type):
 	k = 1
 	flag = -1
 	sign = []
-	cantidad = 0
+	cantidad = 1
 	for i in line_aux:
 		if i == '>=':
 			flag_igual=1
@@ -58,12 +58,12 @@ def file_to_matrix(line, type):
 		elif i == '<=' or i == '=':
 			sign.append(i)
 	if flag_igual == 1:
-		largo = restrictions+decision+((cantidad)*2)
+		largo = restrictions+decision+cantidad
 	else:
-		largo = restrictions+decision+1
-	# print(largo)
+		largo = restrictions+decision+cantidad
+	print(restrictions)
+	print(decision)
 	matrix = np.zeros((restrictions+1, largo))
-	
 	# for p in range(largo):
 	# if p < decision:
 	# matrix[0][p] = line_aux[l]
@@ -76,36 +76,47 @@ def file_to_matrix(line, type):
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
-		for j in range(largo):		
+		# print("i" + str(i))
+		for j in range(largo):	
+			# print("j" + str(j))	
 			if j < decision:
 				matrix[i][j] = line_aux[l]
 				l += 1
 			elif i == 0:
 				matrix[0][j] = 0
-			elif j == restrictions+decision:
+			elif j == largo-1 :
 				matrix[i][j] = line_aux[l]
 				l += 1
 				# sign.(line_aux[l])
 				l += 1
 			else:
 				if k == flag:
-					if flag_igual ==1:
-						matriz[i][j] = -1
-						matriz[i][j+1] = 1
+					# print(sign[i-1])
+					if sign[i-1] == ">=":
+						# print("entro")
+						matrix[i][j] = -1
+						# print("entro2")
+						matrix[i][j+1] = 1
+						k+=1
+						flag += 1
 					else:
 						matrix[i][j] = 1
 				k += 1
 				
 	# print(sign)
-	M = 2		
+	M = 1	
 	for i in range(len(sign)):
 		# print(i)
 		j = (i+decision)
 		# print(j)
-		if sign[i] == '=' or sign[i] == '>=':
+		if sign[i] == '=':
 			if type ==2:
 				matrix[0][j] = 1*M
-	
+		if sign[i] == '>=':
+			if type ==2:
+				matrix[0][j+1]=1*M
+			
+	# print(matrix)
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
@@ -113,7 +124,7 @@ def file_to_matrix(line, type):
 				if type ==2:
 					matrix[0][j] -= matrix[i+1][j]*M
 	# print(sign)
-	# print(matrix)
+	print(matrix)
 
 	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
 
