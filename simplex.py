@@ -18,9 +18,7 @@ def open_file(file_name):
 			type = 0
 			print("Error: Invalid problem")
 		checker = check(line)
-		print("hola")
 		aux = file_to_matrix(line, type)
-		print("hola2")
 		file.close()
 	except:
 		aux = None
@@ -167,10 +165,12 @@ if __name__ == '__main__':
 				simplex.simplex(args.output)
 				simplex.print_matrix()
 				simplex.print_result()
+				simplex.resolve_M_op("3M+3", "2M+5", "-1.5")
 				
 			else:
 				simplex.build_matrix()
 				simplex.simplex("out_"+args.input)
 				simplex.print_matrix()
 				simplex.print_result()
+				print("hola")
 				simplex.resolve_M_op("3M+3", "2M+5", "-1.5")

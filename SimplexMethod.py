@@ -166,8 +166,6 @@ class SimplexMethod(object):
 			op2[0] = str(float(op2[0][0:-1]) * float(mul))
 			op2[0] = op2[0] + 'M'
 			op2[1] = str(float(op2[1]) * float(mul))
-			print(op2)
-			print(float(op1[0][:-1])+float(op2[0][:-1]))
 			result.append(str(float(op1[0][:-1])+float(op2[0][:-1])))
 			if float(result[0]) > 0:
 				result[0] = result[0]+'M'
