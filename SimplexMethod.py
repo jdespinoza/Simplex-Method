@@ -4,7 +4,7 @@ from fractions import Fraction
 
 class SimplexMethod(object):
 
-	def __init__(self, matrix_aux, row_size, column_size, decision, restrictions, sign):
+	def __init__(self, matrix_aux, row_size, column_size, decision, restrictions, sign, flag):
 		self.matrix_aux = matrix_aux
 		self.row_size = row_size
 		self.column_size = column_size
@@ -160,6 +160,7 @@ class SimplexMethod(object):
 			else:
 				result = []
 			result.append(str(float(op1[1])+float(op2[1])))
+			result = self.toString_M(result)
 			print(result)
 		elif type_M == 2:
 			op2[0] = str(float(op2[0][0:-1]) * float(mul))
@@ -173,11 +174,13 @@ class SimplexMethod(object):
 			else:
 				result = []
 			result.append(str(float(op1[1])+float(op2[1])))
+			result = self.toString_M(result)
 			print(result)
 		elif type_M == 3:
 			op2 = str(float(op2)*float(mul))
 			result.append(str(op1[0]))
 			result.append(str(float(op1[1])+float(op2)))
+			result = self.toString_M(result)
 			print(result)
 		elif type_M == 4:
 			op2[0] = str(float(op2[0][0:-1]) * float(mul))
@@ -185,6 +188,7 @@ class SimplexMethod(object):
 			op2[1] = str(float(op2[1]) * float(mul))
 			result.append(op2[0])
 			result.append(str(float(op1)+float(op2[1])))
+			result = self.toString_M(result)
 			print(result)
 		elif type_M == 5:
 			aux1 = str(float(op2) * float(mul[0][0:-1]))
@@ -195,11 +199,11 @@ class SimplexMethod(object):
 			op2.append(aux2)
 			result.append(op2[0])
 			result.append(str(float(op2[1])+float(op1)))
+			result = self.toString_M(result)
+			print(result)
 		else:
 			result = str(float(op1) + (float(op2) * float(mul)))
 			print(result)
-		
-				
 			
 	def split_M(self, num):
 		if num.find('+') != -1:
@@ -212,6 +216,9 @@ class SimplexMethod(object):
 				num = aux
 		return num
 		
-		
-		
-		
+	def toString_M(self, array):
+		number = ""
+		for i in array:
+			number += i
+			
+		return number

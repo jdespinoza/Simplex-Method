@@ -17,8 +17,10 @@ def open_file(file_name):
 		else:
 			type = 0
 			print("Error: Invalid problem")
-		checker = check(line) 
+		checker = check(line)
+		print("hola")
 		aux = file_to_matrix(line, type)
+		print("hola2")
 		file.close()
 	except:
 		aux = None
@@ -145,10 +147,7 @@ def file_to_matrix(line, type):
 		if sign[i] == '=' or sign[i] == '>=':
 			for j in range(largo):
 					matrix[0][j] -= matrix[i+1][j]*M
-	# print(sign)
-	# print(matrix)
-
-	# return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
 
 if __name__ == '__main__':
 
