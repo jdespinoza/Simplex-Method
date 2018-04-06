@@ -146,8 +146,10 @@ if __name__ == '__main__':
 				simplex.simplex(args.output)
 				simplex.print_matrix()
 				simplex.print_result()
+				
 			else:
 				simplex.build_matrix()
 				simplex.simplex("salida.txt")
 				simplex.print_matrix()
 				simplex.print_result()
+				simplex.resolve_M_op("3M+3", "2M+5", "-1.5")
