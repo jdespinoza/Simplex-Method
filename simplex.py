@@ -71,7 +71,7 @@ def file_to_matrix(line, type):
 	line_aux = aux[3:]
 	for i in range(decision):
 		if type == 2:
-			line_aux[i] = int(line_aux[i]) * -1
+			line_aux[i] = str(int(line_aux[i]) * -1)
 	# print(line_aux)
 	l = 0
 	k = 1
@@ -93,7 +93,10 @@ def file_to_matrix(line, type):
 	# print(restrictions)
 	# print(decision)
 	# print(largo)
-	matrix = np.zeros((restrictions+1, largo))
+	# matrix = np.zeros((restrictions+1, largo))
+	matrix = ['0'] * (restrictions+1)
+	for i in range(restrictions+1):
+		matrix[i] = ['0'] * largo
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
@@ -101,12 +104,12 @@ def file_to_matrix(line, type):
 		for j in range(largo):	
 			# print("j" + str(j))	
 			if j < decision:
-				matrix[i][j] = line_aux[l]
+				matrix[i][j] = str(line_aux[l])
 				l += 1
 			elif i == 0:
-				matrix[0][j] = 0
+				matrix[0][j] = str(0)
 			elif j == largo-1 :
-				matrix[i][j] = line_aux[l]
+				matrix[i][j] = str(line_aux[l])
 				l += 1
 				# sign.(line_aux[l])
 				l += 1
@@ -115,40 +118,50 @@ def file_to_matrix(line, type):
 					# print(sign[i-1])
 					if sign[i-1] == ">=":
 						# print("entro")
-						matrix[i][j] = -1
+						matrix[i][j] = str(-1)
 						# print("entro2")
-						matrix[i][j+1] = 1
+						matrix[i][j+1] = str(1)
 						k+=1
 						flag += 1
 					else:
-						matrix[i][j] = 1
+						matrix[i][j] = str(1)
 				k += 1
 				
 	# print(sign)
 	M = 1	
 	i = 0
 	j= 0 + decision
+	print(matrix)
+	# print(type(matrix[0][0]))
 	while(i<len(sign)):
 		if sign[i] == '=':
-			matrix[0][j] = 1*M
+			matrix[0][j] = "M"
 			j+=1
 		elif sign[i] == '>=':
-			matrix[0][j+1] = 1*M
+			matrix[0][j+1] = "M"
 			j+=2
 		else:
 			j+=1
 		i+=1
 				
-	# print(matrix)
+	print("asa")
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
 			for j in range(largo):
-					matrix[0][j] -= matrix[i+1][j]*M
+				if(matrix[i+1][j] != '0'):
+					elemento  =  str(matrix[0][j])  + "+" + "-" + str(matrix[i+1][j]) + "M"
+					# print(elemento)
+					matrix[0][j] = elemento
+				# matrix[0][j] -= matrix[i+1][j]
+				else:
+					elemento  =  str(matrix[0][j])
+					matrix[0][j] = elemento
+					
 	# print(sign)
-	# print(matrix)
-
-	# return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
+	print(matrix)
+	# a 
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
 
 if __name__ == '__main__':
 
