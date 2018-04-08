@@ -5,7 +5,7 @@ from fractions import Fraction
 class SimplexMethod(object):
 
 	def __init__(self, matrix_aux, row_size, column_size, decision, restrictions, sign):
-		self.matrix_aux = matrix_aux
+		self.matrix = matrix_aux
 		self.row_size = row_size
 		self.column_size = column_size
 		self.decision = decision
@@ -35,7 +35,7 @@ class SimplexMethod(object):
 		print(self.matrix)
 
 	def get_result(self):
-		self.result = np.zeros(self.decision + self.restrictions + 1)
+		self.result = ['0'] * (self.decision + self.restrictions + 1)
 		j = 0
 		for i in self.VB:
 			self.result[i] = self.matrix[j][self.column_size-1]
@@ -49,20 +49,30 @@ class SimplexMethod(object):
 	def simplex(self, salida):
 		archivo = open(salida, "w+")
 		while(self.check_matrix()):
+			print("1")
 			self.choose_column()
+			print("2")
 			self.choose_pivot()
+			print("3")
 			self.new_matrix()
+			print("4")
 			archivo.write(str(self.matrix)+'\n')
+			print("5")
 			archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
 			#print("Pivote: ", self.pivot[1])
 			#print("Entra: X-", self.column + 1)
+			print("6")
 			archivo.write("Entra: X-" + str(self.column + 1) +'\n')
 			#print("Sale: X-", self.VB[self.pivot[0]])
+			print("7")
 			archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+			print("8")
 			self.VB[self.pivot[0]] = self.column + 1
 			#print(self.VB)
 			#print("----------------------------------------------------")
+		print("9")
 		self.get_result()
+		print("10")
 		archivo.close()
 
 	def print_result(self):
@@ -75,13 +85,15 @@ class SimplexMethod(object):
 		Metodo para simplex
 	"""
 	def choose_column(self):
-		bit = self.matrix[0][0]
+		bit = self.matrix[0][0].split('+')
 		j = 0
-		for i in range(1, self.column_size-1):
-			if self.matrix[0][i] < bit:
+		for i in range(1, self.decision):
+			num = self.matrix[0][i].split('+')
+			if float(num[1][:-1]) < float(bit[1][:-1]):
 				bit = self.matrix[0][i]
 				j = i
 		self.column = j
+		print("columna: ", self.column)
 
 	"""
 		Selecciona el pivote de acuerdo a la columna seleccionada
@@ -102,10 +114,10 @@ class SimplexMethod(object):
 		Evita divisiones entre cero
 	"""
 	def choose_pivot_aux(self, num1, num2):
-		if num1 <= 0:
+		if float(num1) <= 0:
 			return 10000
 		try:
-			result = num2 / num1
+			result = float(num2) / float(num1)
 		except:
 			result = 0
 
@@ -113,18 +125,25 @@ class SimplexMethod(object):
 
 	def new_matrix(self):
 		for i in range(self.column_size):
-			self.matrix[self.pivot[0]][i] /= self.pivot[1]
+			self.matrix[self.pivot[0]][i] = str(float(self.matrix[self.pivot[0]][i]) / float(self.pivot[1]))
 
 		for i in range(self.row_size):
-			self.aux = self.matrix[i][self.column]*-1
+			print("Jason")
+			self.aux = self.resolve_M_op("0", self.matrix[i][self.column], "-1")
 			for j in range(self.column_size):
-				if i != self.pivot[0]:
-					self.matrix[i][j] = self.matrix[i][j] + (self.aux * self.matrix[self.pivot[0]][j])
+				if i != float(self.pivot[0]):
+					print("Resolver")
+					print(self.matrix[i][j])
+					print(self.aux)
+					print(self.matrix[self.pivot[0]][j])
+					self.matrix[i][j] = self.resolve_M_op(self.matrix[i][j], self.aux, self.matrix[self.pivot[0]][j])
 
 	def check_matrix(self):
 		for i in range(self.column_size):
-			if self.matrix[0][i] < 0:
-				return True
+			aux = self.matrix[0][i].split('+')
+			if len(aux) > 1:
+				if float(aux[1][:-1]) < 0:
+					return True
 		return False
 		
 	def resolve_M_op(self, op1, op2, aux):
@@ -197,7 +216,7 @@ class SimplexMethod(object):
 			result.append(str(float(op2[1])+float(op1)))
 		else:
 			result = str(float(op1) + (float(op2) * float(mul)))
-			print(result)
+		return result
 		
 				
 			

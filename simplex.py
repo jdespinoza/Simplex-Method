@@ -131,7 +131,6 @@ def file_to_matrix(line, type):
 	M = 1	
 	i = 0
 	j= 0 + decision
-	print(matrix)
 	# print(type(matrix[0][0]))
 	while(i<len(sign)):
 		if sign[i] == '=':
@@ -144,7 +143,6 @@ def file_to_matrix(line, type):
 			j+=1
 		i+=1
 				
-	print("asa")
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
@@ -160,8 +158,9 @@ def file_to_matrix(line, type):
 					
 	# print(sign)
 	print(matrix)
+	print("antes de return")
 	# a 
-	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual)
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
 
 if __name__ == '__main__':
 
@@ -177,13 +176,13 @@ if __name__ == '__main__':
 			print("Error: Simplex is None")
 		else:
 			if args.output:
-				simplex.build_matrix()
+				#simplex.build_matrix()
 				simplex.simplex(args.output)
 				simplex.print_matrix()
 				simplex.print_result()
 				
 			else:
-				simplex.build_matrix()
+				#simplex.build_matrix()
 				simplex.simplex("out_"+args.input)
 				simplex.print_matrix()
 				simplex.print_result()
