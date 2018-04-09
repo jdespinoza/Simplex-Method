@@ -17,7 +17,7 @@ def open_file(file_name):
 		else:
 			type = 0
 			print("Error: Invalid problem")
-		checker = check(line) 
+		# checker = check(line) 
 		aux = file_to_matrix(line, type)
 		file.close()
 	except:
@@ -37,6 +37,16 @@ def check(line):
 		else:
 			aux.append(i)
 	print(aux)
+	i =0
+	if( aux[i] =='max' or aux[i] =='min'):
+		i+=1
+		if(isinstance(aux[i], int) and isinstance(aux[i+1], int)):
+			i+=2
+			return 0
+		else:
+			return 1
+	else:
+		return 1
 	
 	return 0
 	
@@ -71,10 +81,11 @@ def file_to_matrix(line, type):
 	line_aux = aux[3:]
 	for i in range(decision):
 		if type == 2:
-			line_aux[i] = str(int(line_aux[i]) * -1)
+			line_aux[i] = int(line_aux[i]) * -1
 	# print(line_aux)
 	l = 0
 	k = 1
+	flag_A = False
 	flag = -1
 	sign = []
 	cantidad = 1
@@ -93,10 +104,8 @@ def file_to_matrix(line, type):
 	# print(restrictions)
 	# print(decision)
 	# print(largo)
-	# matrix = np.zeros((restrictions+1, largo))
-	matrix = ['0'] * (restrictions+1)
-	for i in range(restrictions+1):
-		matrix[i] = ['0'] * largo
+	matrix = np.zeros((restrictions+1, largo))
+	VB = []
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
@@ -104,12 +113,12 @@ def file_to_matrix(line, type):
 		for j in range(largo):	
 			# print("j" + str(j))	
 			if j < decision:
-				matrix[i][j] = str(line_aux[l])
+				matrix[i][j] = line_aux[l]
 				l += 1
 			elif i == 0:
-				matrix[0][j] = str(0)
+				matrix[0][j] = 0
 			elif j == largo-1 :
-				matrix[i][j] = str(line_aux[l])
+				matrix[i][j] = line_aux[l]
 				l += 1
 				# sign.(line_aux[l])
 				l += 1
@@ -118,49 +127,46 @@ def file_to_matrix(line, type):
 					# print(sign[i-1])
 					if sign[i-1] == ">=":
 						# print("entro")
-						matrix[i][j] = str(-1)
+						matrix[i][j] = -1
 						# print("entro2")
-						matrix[i][j+1] = str(1)
+						matrix[i][j+1] = 1
 						k+=1
 						flag += 1
+						VB.append(j+2)
+						#print("Artificial: ", j+2)
 					else:
-						matrix[i][j] = str(1)
+						matrix[i][j] = 1
 				k += 1
 				
 	# print(sign)
 	M = 1	
 	i = 0
 	j= 0 + decision
-	# print(type(matrix[0][0]))
+	print(matrix)
 	while(i<len(sign)):
 		if sign[i] == '=':
-			matrix[0][j] = "M"
+			matrix[0][j] = 1*M
 			j+=1
 		elif sign[i] == '>=':
-			matrix[0][j+1] = "M"
+			if type ==1:
+				matrix[0][j+1] = 1*M
+			else:
+				matrix[0][j+1] = 1*M
 			j+=2
 		else:
 			j+=1
 		i+=1
 				
+	print(matrix)
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
 			for j in range(largo):
-				if(matrix[i+1][j] != '0'):
-					elemento  =  str(matrix[0][j])  + "+" + "-" + str(matrix[i+1][j]) + "M"
-					# print(elemento)
-					matrix[0][j] = elemento
-				# matrix[0][j] -= matrix[i+1][j]
-				else:
-					elemento  =  str(matrix[0][j])
-					matrix[0][j] = elemento
-					
+					matrix[0][j] -= matrix[i+1][j]*M
 	# print(sign)
 	print(matrix)
-	print("antes de return")
-	# a 
-	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign)
+
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual, VB)
 
 if __name__ == '__main__':
 
@@ -176,14 +182,12 @@ if __name__ == '__main__':
 			print("Error: Simplex is None")
 		else:
 			if args.output:
-				#simplex.build_matrix()
+				simplex.build_matrix()
 				simplex.simplex(args.output)
 				simplex.print_matrix()
 				simplex.print_result()
-				
 			else:
-				#simplex.build_matrix()
+				simplex.build_matrix()
 				simplex.simplex("out_"+args.input)
 				simplex.print_matrix()
 				simplex.print_result()
-				simplex.resolve_M_op("3M+3", "2M+5", "-1.5")
