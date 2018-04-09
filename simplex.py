@@ -17,6 +17,7 @@ def open_file(file_name):
 		else:
 			type = 0
 			print("Error: Invalid problem")
+		# checker = check(line) 
 		aux = file_to_matrix(line, type)
 		file.close()
 	except:
@@ -24,49 +25,148 @@ def open_file(file_name):
 		print("No such file or directory: ", file_name)
 	return aux
 
-def file_to_matrix(line, type):
-	decision = int(line[4])
-	restrictions = int(line[6])
-	matrix = np.zeros((restrictions+1, restrictions+decision+1))
-	line = line[8:]
-	line = line.split(',')
-	line_aux = []
-	for i in line:
+def check(line):
+	line2 = line.split(',')
+	aux = []
+	for i in line2:
 		if i.find('\n') != -1:
 			array = i.split('\n')
-			line_aux.append(array[0])
-			line_aux.append(array[1])
+			aux.append(array[0])
+			aux.append(array[1])
+			
 		else:
-			line_aux.append(i)
-
+			aux.append(i)
+	print(aux)
+	i =0
+	if( aux[i] =='max' or aux[i] =='min'):
+		i+=1
+		if(isinstance(aux[i], int) and isinstance(aux[i+1], int)):
+			i+=2
+			return 0
+		else:
+			return 1
+	else:
+		return 1
+	
+	return 0
+	
+def file_to_matrix(line, type):
+	flag_igual = 0
+	largo = 0
+	line2 = line.split(',')
+	element0 = line2[0].split('\n')
+	element1= line2[1].split('\n')
+	decision = int(element0[1])
+	restrictions = int(element1[0])
+	aux = []
+	for i in line2:
+		if i.find('\n') != -1:
+			array = i.split('\n')
+			aux.append(array[0])
+			aux.append(array[1])
+			
+		else:
+			aux.append(i)
+	# matrix = np.zeros((restrictions+1, restrictions+decision+1))
+	# line = line[8:]
+	# line = line.split(',')
+	line_aux = []
+	# for i in line:
+	# if i.find('\n') != -1:
+	# array = i.split('\n')
+	# line_aux.append(array[0])
+	# line_aux.append(array[1])	
+	# else:
+	# line_aux.append(i)
+	line_aux = aux[3:]
 	for i in range(decision):
-		line_aux[i] = int(line_aux[i]) * -1
-
-
+		if type == 2:
+			line_aux[i] = int(line_aux[i]) * -1
+	# print(line_aux)
 	l = 0
 	k = 1
+	flag_A = False
 	flag = -1
 	sign = []
-	for i in range(restrictions+1):
+	cantidad = 1
+	for i in line_aux:
+		if i == '>=':
+			flag_igual=1
+			sign.append(i)
+			cantidad+=1
+		elif i == '<=' or i == '=':
+			sign.append(i)
+	if flag_igual == 1:
+		largo = restrictions+decision+cantidad
+	else:
+		largo = restrictions+decision+cantidad
+	# print(cantidad)
+	# print(restrictions)
+	# print(decision)
+	# print(largo)
+	matrix = np.zeros((restrictions+1, largo))
+	VB = []
+	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
-		for j in range(restrictions+decision+1):
+		# print("i" + str(i))
+		for j in range(largo):	
+			# print("j" + str(j))	
 			if j < decision:
 				matrix[i][j] = line_aux[l]
 				l += 1
 			elif i == 0:
-				matrix[i][j] = 0
-			elif j == restrictions+decision:
+				matrix[0][j] = 0
+			elif j == largo-1 :
 				matrix[i][j] = line_aux[l]
 				l += 1
-				sign.append(line_aux[l])
+				# sign.(line_aux[l])
 				l += 1
 			else:
 				if k == flag:
-					matrix[i][j] = 1
+					# print(sign[i-1])
+					if sign[i-1] == ">=":
+						# print("entro")
+						matrix[i][j] = -1
+						# print("entro2")
+						matrix[i][j+1] = 1
+						k+=1
+						flag += 1
+						VB.append(j+2)
+						#print("Artificial: ", j+2)
+					else:
+						matrix[i][j] = 1
 				k += 1
+				
+	# print(sign)
+	M = 1	
+	i = 0
+	j= 0 + decision
+	print(matrix)
+	while(i<len(sign)):
+		if sign[i] == '=':
+			matrix[0][j] = 1*M
+			j+=1
+		elif sign[i] == '>=':
+			if type ==1:
+				matrix[0][j+1] = 1*M
+			else:
+				matrix[0][j+1] = 1*M
+			j+=2
+		else:
+			j+=1
+		i+=1
+				
+	print(matrix)
+	for i in range(len(sign)):
+		# print(i)
+		if sign[i] == '=' or sign[i] == '>=':
+			for j in range(largo):
+					matrix[0][j] -= matrix[i+1][j]*M
+	# print(sign)
+	print(matrix)
 
-	return SimplexMethod(matrix, restrictions+1, restrictions+decision+1, decision, restrictions, sign)
+	return SimplexMethod(matrix, restrictions+1,largo, decision, restrictions, sign,flag_igual, VB)
 
 if __name__ == '__main__':
 
@@ -81,10 +181,13 @@ if __name__ == '__main__':
 		if simplex is None:
 			print("Error: Simplex is None")
 		else:
-			simplex.build_matrix()
-			simplex.simplex(args.output)
-			simplex.print_matrix()
-			simplex.print_result()
-
-	if args.output:
-		print("Output File:", args.output)
+			if args.output:
+				simplex.build_matrix()
+				simplex.simplex(args.output)
+				simplex.print_matrix()
+				simplex.print_result()
+			else:
+				simplex.build_matrix()
+				simplex.simplex("out_"+args.input)
+				simplex.print_matrix()
+				simplex.print_result()

@@ -4,22 +4,28 @@ from fractions import Fraction
 
 class SimplexMethod(object):
 
-	def __init__(self, matrix_aux, row_size, column_size, decision, restrictions, sign):
+	def __init__(self, matrix_aux, row_size, column_size, decision, restrictions, sign,flag, VB):
 		self.matrix_aux = matrix_aux
 		self.row_size = row_size
 		self.column_size = column_size
 		self.decision = decision
 		self.restrictions = restrictions
 		self.sign = sign
-		self.start_VB(decision, restrictions)
+		self.start_VB(VB, decision, restrictions)
+		self.flag = flag
 
-	def start_VB(self, decision, restrictions):
-		self.VB = [0]
-		for i in range(decision+1, 1000):
-			if restrictions <= 0:
-				break
-			self.VB.append(i)
-			restrictions -= 1
+	def start_VB(self, VB, decision, restrictions):
+		if len(VB) == 0:
+			self.VB = [0]
+			for i in range(decision+1, 1000):
+				if restrictions <= 0:
+					break
+				self.VB.append(i)
+				restrictions -= 1
+		else:
+			self.VB = [0]
+			for i in VB:
+				self.VB.append(i)
 
 	"""
 		Convierte los elementos de la matriz en fracciones
@@ -32,36 +38,65 @@ class SimplexMethod(object):
 				self.matrix[i][j] = int(self.matrix_aux[i][j])
 
 	def print_matrix(self):
-		print(self.matrix)
+		for p in range(self.column_size):
+			print("-----------",end="")
+		print()
+		print(" VB ",end="")
+		for p in range(self.column_size-1):
+			print(" X-"+str(p+1)+"      ",end="")
+		print("  U  ",end="")
+		print('\n')
+		for i in range(self.row_size):
+			print("va",end="")
+			for j in range(self.column_size):
+				print(" | ",end="")
+				print("%.2f" % (self.matrix[i][j]) ,end="")
+				print(" | ",end="")
+			print('\n')
+		# print(self.matrix)
 
 	def get_result(self):
-		self.result = np.zeros(self.decision + self.restrictions + 1)
+		if(self.flag==0):
+			self.result = np.zeros(self.decision + self.restrictions + 1)
+		else:
+			self.result = np.zeros(self.decision + self.restrictions + 2)
 		j = 0
 		for i in self.VB:
 			self.result[i] = self.matrix[j][self.column_size-1]
 			j += 1
-
-
-
+    
 	"""
 		Funcion controlador del metodo simplex
 	"""
 	def simplex(self, salida):
 		archivo = open(salida, "w+")
+		# print(self.matrix_aux)
+		archivo.write(str(self.matrix)+'\n')
+		contador = 0
 		while(self.check_matrix()):
-			self.choose_column()
-			self.choose_pivot()
-			self.new_matrix()
-			archivo.write(str(self.matrix)+'\n')
-			archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
-			#print("Pivote: ", self.pivot[1])
-			#print("Entra: X-", self.column + 1)
-			archivo.write("Entra: X-" + str(self.column + 1) +'\n')
-			#print("Sale: X-", self.VB[self.pivot[0]])
-			archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
-			self.VB[self.pivot[0]] = self.column + 1
-			#print(self.VB)
-			#print("----------------------------------------------------")
+			contador +=1
+			if contador != 200:
+				self.choose_column()
+				self.choose_pivot()
+				self.new_matrix()
+				# archivo.write(str(self.matrix)+'\n')
+				# print("a")
+				# guardarArchivo(self)
+				archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
+				#print("Pivote: ", self.pivot[1])
+				#print("Entra: X-", self.column + 1)
+				archivo.write("Entra: X-" + str(self.column + 1) +'\n')
+				#print("Sale: X-", self.VB[self.pivot[0]])
+				print(self.VB)
+				print(self.pivot)
+				archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+				self.VB[self.pivot[0]] = self.column + 1
+				# print(self.VB)
+				#print("----------------------------------------------------")
+				archivo.write(str(self.matrix)+'\n')
+			else:
+				print("No tiene solucion")
+				break
 		self.get_result()
 		archivo.close()
 
@@ -122,7 +157,7 @@ class SimplexMethod(object):
 					self.matrix[i][j] = self.matrix[i][j] + (aux * self.matrix[self.pivot[0]][j])
 
 	def check_matrix(self):
-		for i in range(self.column_size):
+		for i in range(self.column_size-1):
 			if self.matrix[0][i] < 0:
 				return True
 		return False
