@@ -27,8 +27,8 @@ class SimplexMethod(object):
 			for i in VB:
 				self.VB.append(i)
 		"""
-		"""self.VB = [0]
-		cont = decison + 1
+		self.VB = [0]
+		cont = decision + 1
 		for i in self.sign:
 			if i == "<=":
 				self.VB.append(cont)
@@ -37,14 +37,9 @@ class SimplexMethod(object):
 				self.VB.append(cont)
 				cont += 1
 			elif i == ">=":
-				self.VB.append(cont)
 				cont += 1
 				self.VB.append(cont)
 				cont += 1
-		"""
-		self.VB = [0]
-		for i in range(restrictions):
-			self.VB.append(i)
 
 	"""
 		Convierte los elementos de la matriz en fracciones

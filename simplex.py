@@ -7,22 +7,22 @@ import numpy as np
 from SimplexMethod import SimplexMethod
 
 def open_file(file_name):
-	try:
-		file = open(file_name, "r")
-		line = file.read()
-		if line.find('min') != -1:
-			type = 1
-		elif line.find('max') != -1:
-			type = 2
-		else:
-			type = 0
-			print("Error: Invalid problem")
+	#try:
+	file = open(file_name, "r")
+	line = file.read()
+	if line.find('min') != -1:
+		type = 1
+	elif line.find('max') != -1:
+		type = 2
+	else:
+		type = 0
+		print("Error: Invalid problem")
 		# checker = check(line) 
-		aux = file_to_matrix(line, type)
-		file.close()
-	except:
-		aux = None
-		print("No such file or directory: ", file_name)
+	aux = file_to_matrix(line, type)
+	file.close()
+	#except:
+	#	aux = None
+	#	print("No such file or directory: ", file_name)
 	return aux
 
 def check(line):
