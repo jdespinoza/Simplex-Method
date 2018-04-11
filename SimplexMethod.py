@@ -14,6 +14,8 @@ class SimplexMethod(object):
 		self.start_VB(VB, decision, restrictions)
 		self.flag = flag
 		self.isDegenerate = False
+		self.U_bounded = False
+		self.multiple = -1
 
 	def start_VB(self, VB, decision, restrictions):
 		self.VB = [0]
@@ -115,7 +117,27 @@ class SimplexMethod(object):
 		self.get_result()
 		if self.isDegenerate == True:
 			archivo.write("Solucion optima degenerada")
+		if self.check_multiple():
+			archivo.write("Solucione multiple\n")
+			print("multiple")
+			self.column = self.multiple
+			self.choose_pivot()
+			self.new_matrix()
+			archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
+			archivo.write("Entra: X-" + str(self.column + 1) +'\n')
+			archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+			self.VB[self.pivot[0]] = self.column + 1
+			self.imprimeArchivo(self.matrix,archivo)
 		archivo.close()
+		
+	def check_multiple(self):
+		print(self.VB)
+		for i in range(self.column_size):
+			if i+1 not in self.VB:
+				if self.matrix[0][i] == 0:
+					self.multiple = i
+					return True
+		return False
 		
 	def check_degenerate(self):
 		for i in range(1, self.row_size):
