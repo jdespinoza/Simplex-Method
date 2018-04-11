@@ -13,20 +13,9 @@ class SimplexMethod(object):
 		self.sign = sign
 		self.start_VB(VB, decision, restrictions)
 		self.flag = flag
+		self.isDegenerate = False
 
 	def start_VB(self, VB, decision, restrictions):
-		"""if len(VB) == 0:
-			self.VB = [0]
-			for i in range(decision+1, 1000):
-				if restrictions <= 0:
-					break
-				self.VB.append(i)
-				restrictions -= 1
-		else:
-			self.VB = [0]
-			for i in VB:
-				self.VB.append(i)
-		"""
 		self.VB = [0]
 		cont = decision + 1
 		for i in self.sign:
@@ -65,9 +54,11 @@ class SimplexMethod(object):
 			for j in range(self.column_size):
 				print(" | ",end="")
 				print("%.2f" % (self.matrix[i][j]) ,end="")
+				# print(int(self.matrix[i][j]),end="")
 				print(" | ",end="")
 			print('\n')
 		# print(self.matrix)
+	
 
 	def get_result(self):
 		if(self.flag==0):
@@ -78,19 +69,28 @@ class SimplexMethod(object):
 		for i in self.VB:
 			self.result[i] = self.matrix[j][self.column_size-1]
 			j += 1
-    
+
 	"""
 		Funcion controlador del metodo simplex
 	"""
 	def simplex(self, salida):
+		print(salida)
 		archivo = open(salida, "w+")
 		# print(self.matrix_aux)
-		archivo.write(str(self.matrix)+'\n')
+		# archivo.write(str(self.matrix)+'\n')
+		self.imprimeArchivo(self.matrix, archivo)
+		
 		contador = 0
 		while(self.check_matrix()):
+			#verifica si la U es no acotada
 			contador +=1
 			if contador != 200:
 				self.choose_column()
+				#verifica si la U es no acotada
+				if self.check_U():
+					archivo.write("U no acotada")
+					self.U_bounded = True
+					break
 				self.choose_pivot()
 				self.new_matrix()
 				# archivo.write(str(self.matrix)+'\n')
@@ -101,23 +101,66 @@ class SimplexMethod(object):
 				#print("Entra: X-", self.column + 1)
 				archivo.write("Entra: X-" + str(self.column + 1) +'\n')
 				#print("Sale: X-", self.VB[self.pivot[0]])
-				print(self.VB)
-				print(self.pivot)
 				archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
 				self.VB[self.pivot[0]] = self.column + 1
 				# print(self.VB)
 				#print("----------------------------------------------------")
-				archivo.write(str(self.matrix)+'\n')
+				# archivo.write(str(self.matrix)+'\n')
+				self.imprimeArchivo(self.matrix,archivo)
+				if self.isDegenerate == False:
+					self.check_degenerate()
 			else:
 				print("No tiene solucion")
 				break
 		self.get_result()
+		if self.isDegenerate == True:
+			archivo.write("Solucion optima degenerada")
 		archivo.close()
+		
+	def check_degenerate(self):
+		for i in range(1, self.row_size):
+			if self.matrix[i][self.column_size-1] == 0:
+				self.isDegenerate = True
+
+	def check_U(self):
+		U_bounded = True
+		for i in range(self.row_size):
+			if self.matrix[i][self.column] > 0:
+				print("matriz: ", self.matrix[i][self.column])
+				U_bounded = False
+		return U_bounded
 
 	def print_result(self):
 		print("U = ", self.result[0])
 		for i in range(1, len(self.result)):
+			print(len(self.result))
 			print("X**", i, " = ", self.result[i])
+		if self.isDegenerate == True:
+			print("Solucion optima degenerada")
+		if self.U_bounded:
+			print("U no acotada")
+	
+	def imprimeArchivo(self, matrix, archivo):
+		# print(salida)
+		# archivo = open(salida, "a")
+		for p in range(self.column_size):
+			archivo.write("-----------")
+		archivo.write('\n')
+		archivo.write(" VB ")
+		for p in range(self.column_size-1):
+			archivo.write(" X-"+str(p+1)+"      ")
+		archivo.write("  U  ")
+		archivo.write('\n')
+		for i in range(self.row_size):
+			archivo.write("va")
+			for j in range(self.column_size):
+				archivo.write(" | ")
+				archivo.write("%.2f" % (matrix[i][j]))
+				# print(int(self.matrix[i][j]),end="")
+				archivo.write(" | ")
+			archivo.write('\n')
+		archivo.write('\n')
+		# archivo.close()
 
 	"""
 		Selecciona la columna por la cual se empezara a trabajar
