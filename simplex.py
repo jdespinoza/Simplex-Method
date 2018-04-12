@@ -173,7 +173,7 @@ def file_to_matrix(line, type):
 	for i in range(restrictions+1):
 		matrix[i] = [0] * largo
 	"""
-	lleva la matrix
+	llena la matrix, con los datos del archivo
 	"""
 	for i in range(restrictions+1):	
 		flag += 1
