@@ -11,12 +11,18 @@ class SimplexMethod(object):
 		self.decision = decision
 		self.restrictions = restrictions
 		self.sign = sign
+		#iniciacion de las VB
 		self.start_VB(VB, decision, restrictions)
+		#banderas
 		self.flag = flag
 		self.isDegenerate = False
 		self.U_bounded = False
 		self.multiple = -1
 
+	"""
+		Se inicializan las VB de acuerdo a los signos
+		del problemas (<=, >=, =)
+	"""
 	def start_VB(self, VB, decision, restrictions):
 		self.VB = [0]
 		cont = decision + 1
@@ -28,19 +34,16 @@ class SimplexMethod(object):
 				self.VB.append(cont)
 				cont += 1
 			elif i == ">=":
+				#se ignora la de exceso
 				cont += 1
 				self.VB.append(cont)
 				cont += 1
 
 	"""
-		Convierte los elementos de la matriz en fracciones
+		Copiamos la matrix de parametro a la matrix de la clase
+		para evitar cualquier incoveniente con el tipo de dato
 	"""
 	def build_matrix(self):
-		# self.matrix = np.zeros((self.row_size, self.column_size))
-
-		# for i in range(self.row_size):
-		# for j in range(self.column_size):
-		# self.matrix[i][j] = int(self.matrix_aux[i][j])\
 		self.matrix = [0] * (self.row_size)
 		for i in range(self.row_size):
 			self.matrix[i] = [0] * self.column_size
@@ -48,6 +51,10 @@ class SimplexMethod(object):
 			for j in range(self.column_size):
 				self.matrix[i][j] = self.matrix_aux[i][j]
 
+	"""
+		Imprime de forma entendible la matriz con sus
+		respectivas VB
+	"""
 	def print_matrix(self):
 		M = 10000
 		for p in range(self.column_size):
@@ -77,14 +84,13 @@ class SimplexMethod(object):
 					print(" | ",end="")
 				else:
 					print(" | ",end="")
-					# print(int())
 					print("%.2f" % (self.matrix[i][j]) ,end="")
-					# print(int(self.matrix[i][j]),end="")
 					print(" | ",end="")
 			print('\n')
-		# print(self.matrix)
-	
 
+	"""
+		Crea un arreglo con los valores de las VB y de la U
+	"""
 	def get_result(self):
 		if(self.flag==0):
 			self.result = np.zeros(self.decision + self.restrictions + 1)
@@ -100,19 +106,14 @@ class SimplexMethod(object):
 
 	"""
 		Funcion controlador del metodo simplex
+		Maneja el ciclo principal del metodo simplex
 	"""
 	def simplex(self, exitA):
-		# print(salida)
-		# archivo = open(salida, "w+")
 		FileS= open(exitA, "w+")
-		# print(self.matrix_aux)
-		# archivo.write(str(self.matrix)+'\n')
-		# self.imprimeArchivo(self.matrix, archivo)
 		self.write_file(self.matrix, FileS)
-		
 		countV = 0
+		
 		while(self.check_matrix()):
-			#verifica si la U es no acotada
 			countV +=1
 			if countV != 200:
 				self.choose_column()
@@ -123,20 +124,15 @@ class SimplexMethod(object):
 					break
 				self.choose_pivot()
 				self.new_matrix()
-				# archivo.write(str(self.matrix)+'\n')
-				# print("a")
-				# guardarArchivo(self)
+				#escribe en archvo el pivote y las variables que salen y entran
 				FileS.write("Pivote: " + str(self.pivot[1]) +'\n')
-				#print("Pivote: ", self.pivot[1])
-				#print("Entra: X-", self.column + 1)
 				FileS.write("Entra: X-" + str(self.column + 1) +'\n')
-				#print("Sale: X-", self.VB[self.pivot[0]])
 				FileS.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+				#intercambia los valores de las VB
+				#los que salen y los que entran
 				self.VB[self.pivot[0]] = self.column + 1
-				# print(self.VB)
-				#print("----------------------------------------------------")
-				# archivo.write(str(self.matrix)+'\n')
 				self.write_file(self.matrix,FileS)
+				#verifica si la matrix actual es degenerada o no
 				if self.isDegenerate == False:
 					self.check_degenerate()
 			else:
@@ -144,11 +140,13 @@ class SimplexMethod(object):
 				break
 		self.get_result()
 		self.SaveResult(FileS)
-		if self.isDegenerate == True:
+		#verifica las banderas para indicar al usuario el estado de la solucion
+		if self.isDegenerate:
 			FileS.write("Solucion optima degenerada")
+		#si es solucion multiple se hace una iteracion mas
 		if self.check_multiple():
 			FileS.write("Solucione multiple\n")
-			print("multiple")
+			print("Solucion Multiple")
 			self.column = self.multiple
 			self.choose_pivot()
 			self.new_matrix()
@@ -156,12 +154,15 @@ class SimplexMethod(object):
 			FileS.write("Entra: X-" + str(self.column + 1) +'\n')
 			FileS.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
 			self.VB[self.pivot[0]] = self.column + 1
-			# self.imprimeArchivo(self.matrix,archivo)
 			self.write_file(self.matrix,FileS)
 		FileS.close()
 		
+	"""
+		Verifica si una solucion tiene 0 en una variable
+		no basica, si es asi, se activa bandera de solucion
+		multiple
+	"""
 	def check_multiple(self):
-		print(self.VB)
 		for i in range(self.column_size):
 			if i+1 not in self.VB:
 				res = self.matrix[0][i][0] + self.matrix[0][i][1]
@@ -170,35 +171,47 @@ class SimplexMethod(object):
 					return True
 		return False
 		
+	"""
+		Verifica si hay un 0 en la columna de respuestas
+		si es asi, se activa bandera de degenerada
+	"""
 	def check_degenerate(self):
 		for i in range(1, self.row_size):
 			if self.matrix[i][self.column_size-1] == 0:
 				self.isDegenerate = True
 
+	"""
+		Verifica si todos los coeficientes de la columna pivote 
+		son negativos o cero
+	"""
 	def check_U(self):
 		U_bounded = True
 		for i in range(self.row_size):
 			if(i==0):
 				res = self.matrix[i][self.column][0] + self.matrix[i][self.column][1]
 				if(res>0):
-					print("matriz: ", self.matrix[i][self.column])
 					U_bounded = False
 			else:				
 				if self.matrix[i][self.column] > 0:
-					print("matriz: ", self.matrix[i][self.column])
 					U_bounded = False
 		return U_bounded
 
+	"""
+		Imprime los valores de U y de las VB
+		ademas imprime si es degenerada o acotada
+	"""
 	def print_result(self):
 		print("U = ", self.result[0])
 		for i in range(1, len(self.result)):
-			print(len(self.result))
 			print("X**", i, " = ", self.result[i])
 		if self.isDegenerate == True:
 			print("Solucion optima degenerada")
 		if self.U_bounded:
 			print("U no acotada")
 	
+	"""
+		Escribe en el archivo la matriz con sus respuestas
+	"""
 	def write_file(self, matrix, fileA):
 		M = 10000
 		for p in range(self.column_size):
@@ -228,13 +241,10 @@ class SimplexMethod(object):
 					fileA.write(" | ")
 				else:
 					fileA.write(" | ")
-					# print(int())
 					fileA.write("%.2f" % (self.matrix[i][j]))
-					# print(int(self.matrix[i][j]),end="")
 					fileA.write(" | ")
 			fileA.write('\n')
 		fileA.write('\n')
-		# archivo.close()
 	
 	def SaveResult(self, fileP):
 		fileP.write("U = " + str(self.result[0]))
@@ -249,13 +259,11 @@ class SimplexMethod(object):
 	"""
 	def choose_column(self):
 		res = self.matrix[0][0][0] + self.matrix[0][0][1]
-		# bit = self.matrix[0][0]
 		res2=0
 		j = 0
 		for i in range(1, self.column_size-1):
 			res2 = self.matrix[0][i][0] + self.matrix[0][i][1]
 			if res2 < res:
-				# bit = self.matrix[0][i]
 				res = res2
 				j = i
 		self.column = j
@@ -288,6 +296,13 @@ class SimplexMethod(object):
 
 		return result
 
+	"""
+		Genera una nueva matriz para una iteracion,
+		se toma el valor que se encuentra en la columna pivote de la fila
+		que se desea cambiar y se multiplica por -1
+		luego a ese valor se le multiplica el valor de la columna de la fila
+		pivote y se suma al valor que estoy cambiando
+	"""
 	def new_matrix(self):
 		for i in range(self.column_size):
 			self.matrix[self.pivot[0]][i] /= self.pivot[1]
@@ -305,7 +320,10 @@ class SimplexMethod(object):
 				for j in range(self.column_size):
 					if i != self.pivot[0]:
 						self.matrix[i][j] = self.matrix[i][j] + (aux * self.matrix[self.pivot[0]][j])
-
+	
+	"""
+		Revisa si la matrix actual es una solucion optima
+	"""
 	def check_matrix(self):
 		res2 = 0
 		for i in range(self.column_size-1):

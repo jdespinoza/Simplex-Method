@@ -6,6 +6,10 @@ import numpy as np
 
 from SimplexMethod import SimplexMethod
 
+"""
+	lee el archivo y separa los valores leidos, y verifica si es max o min
+	tambien indica al usuario si el formato del archivo es erroneo
+"""
 def open_file(file_name):
 	try:
 		file = open(file_name, "r")
@@ -115,6 +119,12 @@ def check(file_name,line3):
 	file.close()
 	return 0
 	
+"""
+	Coloca los valores leidos del archivo en una matriz,
+	a esta matriz se le ira insertando las variables de holgura,
+	exceso y artificiales segun corresponda, tambien se incluyen
+	las M a los valores que lo necesiten
+"""
 def file_to_matrix(line, type):
 	flag_igual = 0
 	largo = 0
