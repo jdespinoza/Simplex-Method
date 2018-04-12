@@ -34,7 +34,11 @@ def open_file(file_name):
 		print("No such file or directory: ", file_name)
 	return None
 
-		
+"""
+Funcion que revisa el archivo y valida si
+son numeros, sin letras y que tenga el tamano 
+que debe de tener
+"""		
 def check(file_name,line3):
 	file = open(file_name, "r")
 	line4 = line3.split(',')
@@ -168,7 +172,9 @@ def file_to_matrix(line, type):
 	
 	for i in range(restrictions+1):
 		matrix[i] = [0] * largo
-	
+	"""
+	lleva la matrix
+	"""
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
@@ -202,7 +208,9 @@ def file_to_matrix(line, type):
 	# print(matrix)
 	for p in range(largo):
 		matrix[0][p] = [matrix[0][p],0]
-		
+	"""
+	agrega la M a la matriz
+	"""	
 	while(i<len(sign)):
 		if sign[i] == '=':
 			#matrix[0][j] = 1*M
@@ -221,6 +229,10 @@ def file_to_matrix(line, type):
 		i+=1
 				
 	# print(matrix)
+	"""
+	modifica la u, para tener el valor de la fila
+	y eliminar las artificiales, en la fila u
+	"""
 	for i in range(len(sign)):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':

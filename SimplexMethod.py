@@ -246,6 +246,9 @@ class SimplexMethod(object):
 			fileA.write('\n')
 		fileA.write('\n')
 	
+	"""
+	Guarda la solucion, en el archivo
+	"""
 	def SaveResult(self, fileP):
 		fileP.write("U = " + str(self.result[0]))
 		fileP.write('\n')
