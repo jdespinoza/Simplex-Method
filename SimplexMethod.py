@@ -36,28 +36,51 @@ class SimplexMethod(object):
 		Convierte los elementos de la matriz en fracciones
 	"""
 	def build_matrix(self):
-		self.matrix = np.zeros((self.row_size, self.column_size))
+		# self.matrix = np.zeros((self.row_size, self.column_size))
 
+		# for i in range(self.row_size):
+		# for j in range(self.column_size):
+		# self.matrix[i][j] = int(self.matrix_aux[i][j])\
+		self.matrix = [0] * (self.row_size)
+		for i in range(self.row_size):
+			self.matrix[i] = [0] * self.column_size
 		for i in range(self.row_size):
 			for j in range(self.column_size):
-				self.matrix[i][j] = int(self.matrix_aux[i][j])
+				self.matrix[i][j] = self.matrix_aux[i][j]
 
 	def print_matrix(self):
+		M = 10000
 		for p in range(self.column_size):
 			print("-----------",end="")
 		print()
 		print(" VB ",end="")
 		for p in range(self.column_size-1):
 			print(" X-"+str(p+1)+"      ",end="")
-		print("  U  ",end="")
+		print("  R  ",end="")
 		print('\n')
 		for i in range(self.row_size):
-			print("va",end="")
+			if(i==0):
+				print(" U ",end="")
+			else:
+				print("X-" + str(self.VB[i]),end="")
 			for j in range(self.column_size):
-				print(" | ",end="")
-				print("%.2f" % (self.matrix[i][j]) ,end="")
-				# print(int(self.matrix[i][j]),end="")
-				print(" | ",end="")
+				if(i ==0):
+					print(" | ",end="")
+					if(int(self.matrix[i][j][0]) ==0 and (int(self.matrix[i][j][1])/M) == 0):
+						print("0",end="")
+					elif(int(self.matrix[i][j][0]) ==0):
+						print(str((int(self.matrix[i][j][1])/M)) + 'M',end="")
+					elif((int(self.matrix[i][j][1])) ==0):
+						print(str(int(self.matrix[i][j][0])),end="")
+					else:
+						print(str(int(self.matrix[i][j][0])) +' + '+str((int(self.matrix[i][j][1])/M)) + 'M',end="")
+					print(" | ",end="")
+				else:
+					print(" | ",end="")
+					# print(int())
+					print("%.2f" % (self.matrix[i][j]) ,end="")
+					# print(int(self.matrix[i][j]),end="")
+					print(" | ",end="")
 			print('\n')
 		# print(self.matrix)
 	
@@ -69,28 +92,33 @@ class SimplexMethod(object):
 			self.result = np.zeros(self.decision + self.restrictions + 2)
 		j = 0
 		for i in self.VB:
-			self.result[i] = self.matrix[j][self.column_size-1]
+			if(i==0):
+				self.result[i] = self.matrix[j][self.column_size-1][0] +self.matrix[j][self.column_size-1][1]
+			else:
+				self.result[i] = self.matrix[j][self.column_size-1]
 			j += 1
 
 	"""
 		Funcion controlador del metodo simplex
 	"""
-	def simplex(self, salida):
-		print(salida)
-		archivo = open(salida, "w+")
+	def simplex(self, exitA):
+		# print(salida)
+		# archivo = open(salida, "w+")
+		FileS= open(exitA, "w+")
 		# print(self.matrix_aux)
 		# archivo.write(str(self.matrix)+'\n')
-		self.imprimeArchivo(self.matrix, archivo)
+		# self.imprimeArchivo(self.matrix, archivo)
+		self.write_file(self.matrix, FileS)
 		
-		contador = 0
+		countV = 0
 		while(self.check_matrix()):
 			#verifica si la U es no acotada
-			contador +=1
-			if contador != 200:
+			countV +=1
+			if countV != 200:
 				self.choose_column()
 				#verifica si la U es no acotada
 				if self.check_U():
-					archivo.write("U no acotada")
+					FileS.write("U no acotada")
 					self.U_bounded = True
 					break
 				self.choose_pivot()
@@ -98,43 +126,46 @@ class SimplexMethod(object):
 				# archivo.write(str(self.matrix)+'\n')
 				# print("a")
 				# guardarArchivo(self)
-				archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
+				FileS.write("Pivote: " + str(self.pivot[1]) +'\n')
 				#print("Pivote: ", self.pivot[1])
 				#print("Entra: X-", self.column + 1)
-				archivo.write("Entra: X-" + str(self.column + 1) +'\n')
+				FileS.write("Entra: X-" + str(self.column + 1) +'\n')
 				#print("Sale: X-", self.VB[self.pivot[0]])
-				archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+				FileS.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
 				self.VB[self.pivot[0]] = self.column + 1
 				# print(self.VB)
 				#print("----------------------------------------------------")
 				# archivo.write(str(self.matrix)+'\n')
-				self.imprimeArchivo(self.matrix,archivo)
+				self.write_file(self.matrix,FileS)
 				if self.isDegenerate == False:
 					self.check_degenerate()
 			else:
 				print("No tiene solucion")
 				break
 		self.get_result()
+		self.SaveResult(FileS)
 		if self.isDegenerate == True:
-			archivo.write("Solucion optima degenerada")
+			FileS.write("Solucion optima degenerada")
 		if self.check_multiple():
-			archivo.write("Solucione multiple\n")
+			FileS.write("Solucione multiple\n")
 			print("multiple")
 			self.column = self.multiple
 			self.choose_pivot()
 			self.new_matrix()
-			archivo.write("Pivote: " + str(self.pivot[1]) +'\n')
-			archivo.write("Entra: X-" + str(self.column + 1) +'\n')
-			archivo.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
+			FileS.write("Pivote: " + str(self.pivot[1]) +'\n')
+			FileS.write("Entra: X-" + str(self.column + 1) +'\n')
+			FileS.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
 			self.VB[self.pivot[0]] = self.column + 1
-			self.imprimeArchivo(self.matrix,archivo)
-		archivo.close()
+			# self.imprimeArchivo(self.matrix,archivo)
+			self.write_file(self.matrix,FileS)
+		FileS.close()
 		
 	def check_multiple(self):
 		print(self.VB)
 		for i in range(self.column_size):
 			if i+1 not in self.VB:
-				if self.matrix[0][i] == 0:
+				res = self.matrix[0][i][0] + self.matrix[0][i][1]
+				if res == 0:
 					self.multiple = i
 					return True
 		return False
@@ -147,9 +178,15 @@ class SimplexMethod(object):
 	def check_U(self):
 		U_bounded = True
 		for i in range(self.row_size):
-			if self.matrix[i][self.column] > 0:
-				print("matriz: ", self.matrix[i][self.column])
-				U_bounded = False
+			if(i==0):
+				res = self.matrix[i][self.column][0] + self.matrix[i][self.column][1]
+				if(res>0):
+					print("matriz: ", self.matrix[i][self.column])
+					U_bounded = False
+			else:				
+				if self.matrix[i][self.column] > 0:
+					print("matriz: ", self.matrix[i][self.column])
+					U_bounded = False
 		return U_bounded
 
 	def print_result(self):
@@ -162,38 +199,64 @@ class SimplexMethod(object):
 		if self.U_bounded:
 			print("U no acotada")
 	
-	def imprimeArchivo(self, matrix, archivo):
-		# print(salida)
-		# archivo = open(salida, "a")
+	def write_file(self, matrix, fileA):
+		M = 10000
 		for p in range(self.column_size):
-			archivo.write("-----------")
-		archivo.write('\n')
-		archivo.write(" VB ")
+			fileA.write("-----------")
+		fileA.write('\n')
+		fileA.write(" VB ")
 		for p in range(self.column_size-1):
-			archivo.write(" X-"+str(p+1)+"      ")
-		archivo.write("  U  ")
-		archivo.write('\n')
+			fileA.write(" X-"+str(p+1)+"      ")
+		fileA.write("  R  ")
+		fileA.write('\n')
 		for i in range(self.row_size):
-			archivo.write("va")
+			if(i ==0):
+				fileA.write(" U ")
+			else:
+				fileA.write("X-" + str(self.VB[i]))
 			for j in range(self.column_size):
-				archivo.write(" | ")
-				archivo.write("%.2f" % (matrix[i][j]))
-				# print(int(self.matrix[i][j]),end="")
-				archivo.write(" | ")
-			archivo.write('\n')
-		archivo.write('\n')
+				if(i ==0):
+					fileA.write(" | ")
+					if(int(self.matrix[i][j][0]) ==0 and (int(self.matrix[i][j][1])/M) == 0):
+						fileA.write("0")
+					elif(int(self.matrix[i][j][0]) ==0):
+						fileA.write(str((int(self.matrix[i][j][1])/M)) + 'M')
+					elif((int(self.matrix[i][j][1])) ==0):
+						fileA.write(str(int(self.matrix[i][j][0])))
+					else:
+						fileA.write(str(int(self.matrix[i][j][0])) +' + '+str((int(self.matrix[i][j][1])/M)) + 'M')
+					fileA.write(" | ")
+				else:
+					fileA.write(" | ")
+					# print(int())
+					fileA.write("%.2f" % (self.matrix[i][j]))
+					# print(int(self.matrix[i][j]),end="")
+					fileA.write(" | ")
+			fileA.write('\n')
+		fileA.write('\n')
 		# archivo.close()
+	
+	def SaveResult(self, fileP):
+		fileP.write("U = " + str(self.result[0]))
+		fileP.write('\n')
+		for i in range(1, len(self.result)):
+			fileP.write("X**" + str(i) + " = " + str(self.result[i]))
+			fileP.write('\n')
 
 	"""
 		Selecciona la columna por la cual se empezara a trabajar
 		Metodo para simplex
 	"""
 	def choose_column(self):
-		bit = self.matrix[0][0]
+		res = self.matrix[0][0][0] + self.matrix[0][0][1]
+		# bit = self.matrix[0][0]
+		res2=0
 		j = 0
 		for i in range(1, self.column_size-1):
-			if self.matrix[0][i] < bit:
-				bit = self.matrix[0][i]
+			res2 = self.matrix[0][i][0] + self.matrix[0][i][1]
+			if res2 < res:
+				# bit = self.matrix[0][i]
+				res = res2
 				j = i
 		self.column = j
 
@@ -230,13 +293,23 @@ class SimplexMethod(object):
 			self.matrix[self.pivot[0]][i] /= self.pivot[1]
 
 		for i in range(self.row_size):
-			aux = self.matrix[i][self.column]*-1
-			for j in range(self.column_size):
-				if i != self.pivot[0]:
-					self.matrix[i][j] = self.matrix[i][j] + (aux * self.matrix[self.pivot[0]][j])
+			if i ==0:
+				auxA = self.matrix[i][self.column][0]*-1
+				auxB = self.matrix[i][self.column][1]*-1
+				for j in range(self.column_size):
+					if i != self.pivot[0]:
+						self.matrix[i][j][0] = self.matrix[i][j][0] + (auxA * self.matrix[self.pivot[0]][j])
+						self.matrix[i][j][1] = self.matrix[i][j][1] + (auxB * self.matrix[self.pivot[0]][j])
+			else:
+				aux = self.matrix[i][self.column]*-1
+				for j in range(self.column_size):
+					if i != self.pivot[0]:
+						self.matrix[i][j] = self.matrix[i][j] + (aux * self.matrix[self.pivot[0]][j])
 
 	def check_matrix(self):
+		res2 = 0
 		for i in range(self.column_size-1):
-			if self.matrix[0][i] < 0:
+			res2 = self.matrix[0][i][0] + self.matrix[0][i][1]
+			if res2 < 0:
 				return True
 		return False

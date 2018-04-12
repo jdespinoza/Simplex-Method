@@ -46,9 +46,7 @@ def check(file_name,line3):
 	element = line.split('\n')
 	if(element[0] == 'max' or element[0] == 'min'):
 		line = file.readline()
-		print("ok")
 		line2 = line.split(',')
-		print(line2)
 		if(len(line2) == 2):
 			element2= line2[1].split('\n')
 			if(line2[0].isdigit() and element2[0].isdigit()):
@@ -68,7 +66,7 @@ def check(file_name,line3):
 								valor = int(element2[0])
 							except ValueError:
 								return 1
-							print("okas")
+					
 						else:
 							# if(line2[i].isdigit() == False):
 							# return 1
@@ -76,25 +74,22 @@ def check(file_name,line3):
 								valor = int(line2[i])
 							except ValueError:
 								return 1
-							print("oks")
+				
 						i+=1
 					i = 0
 					while(i<res):
 						line = file.readline()
 						line2 = line.split(',')
 						j =0
-						print(len(line2))
-						print(var+2)
 						if(len(line2) ==(var+2)):
-							print("okk")
+					
 							while(j<(var+2)):
 								if(j==(var+1)):
 									element = line2[j].split('\n')
-									print(element)
 									if(element[0] != '=' and element[0] != '<=' and element[0] != '>='):
 										return 1
 										
-									print("okaas")
+							
 								else:
 									# if(line2[j].isdigit() == False):
 									# return 1
@@ -103,7 +98,7 @@ def check(file_name,line3):
 									except ValueError:
 										return 1
 								j+=1
-								print("ok")
+							
 						else:
 							return 1
 							
@@ -157,19 +152,24 @@ def file_to_matrix(line, type):
 		largo = restrictions+decision+cantidad
 	else:
 		largo = restrictions+decision+cantidad
-	matrix = np.zeros((restrictions+1, largo))
+	#matrix = np.zeros((restrictions+1, largo))
+	matrix = [0] * (restrictions+1) 
 	VB = []
+	
+	for i in range(restrictions+1):
+		matrix[i] = [0] * largo
+	
 	for i in range(restrictions+1):	
 		flag += 1
 		k = 1
 		for j in range(largo):	
 			if j < decision:
-				matrix[i][j] = line_aux[l]
+				matrix[i][j] = int(line_aux[l])
 				l += 1
 			elif i == 0:
 				matrix[0][j] = 0
 			elif j == largo-1 :
-				matrix[i][j] = line_aux[l]
+				matrix[i][j] = int(line_aux[l])
 				l += 1
 				# sign.(line_aux[l])
 				l += 1
@@ -190,15 +190,21 @@ def file_to_matrix(line, type):
 	i = 0
 	j= 0 + decision
 	# print(matrix)
+	for p in range(largo):
+		matrix[0][p] = [matrix[0][p],0]
+		
 	while(i<len(sign)):
 		if sign[i] == '=':
-			matrix[0][j] = 1*M
+			#matrix[0][j] = 1*M
+			matrix[0][j] = [matrix[0][j][0],M]
 			j+=1
 		elif sign[i] == '>=':
 			if type ==1:
-				matrix[0][j+1] = 1*M
+				#matrix[0][j+1] = 1*M
+				matrix[0][j+1]= [matrix[0][j+1][0],M]
 			else:
-				matrix[0][j+1] = 1*M
+				#matrix[0][j+1] = 1*M
+				matrix[0][j+1]= [matrix[0][j+1][0],M]
 			j+=2
 		else:
 			j+=1
@@ -209,7 +215,8 @@ def file_to_matrix(line, type):
 		# print(i)
 		if sign[i] == '=' or sign[i] == '>=':
 			for j in range(largo):
-					matrix[0][j] -= matrix[i+1][j]*M
+					#matrix[0][j] -= matrix[i+1][j]*M
+					matrix[0][j][1] -= matrix[i+1][j]*M
 	# print(sign)
 	# print(matrix)
 
