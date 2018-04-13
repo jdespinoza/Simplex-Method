@@ -119,7 +119,7 @@ class SimplexMethod(object):
 				self.choose_column()
 				#verifica si la U es no acotada
 				if self.check_U():
-					FileS.write("U no acotada")
+					FileS.write("U no acotada\n")
 					self.U_bounded = True
 					break
 				self.choose_pivot()
@@ -145,6 +145,8 @@ class SimplexMethod(object):
 			FileS.write("Solucion optima degenerada")
 		#si es solucion multiple se hace una iteracion mas
 		if self.check_multiple():
+			self.print_matrix()
+			self.print_result()
 			FileS.write("Solucione multiple\n")
 			print("Solucion Multiple")
 			self.column = self.multiple
@@ -155,6 +157,8 @@ class SimplexMethod(object):
 			FileS.write("Sale: X-" + str(self.VB[self.pivot[0]]) +'\n')
 			self.VB[self.pivot[0]] = self.column + 1
 			self.write_file(self.matrix,FileS)
+			self.get_result()
+			self.SaveResult(FileS)
 		FileS.close()
 		
 	"""
